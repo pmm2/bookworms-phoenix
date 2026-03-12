@@ -1,5 +1,13 @@
 import Config
 
+# Google OAuth — set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET for sign in with Google.
+# In dev, you can use config/dev.secret.exs instead. In prod, use env vars.
+if client_id = System.get_env("GOOGLE_CLIENT_ID") do
+  config :ueberauth, Ueberauth.Strategy.Google.OAuth,
+    client_id: client_id,
+    client_secret: System.get_env("GOOGLE_CLIENT_SECRET")
+end
+
 # config/runtime.exs is executed for all environments, including
 # during releases. It is executed after compilation and before the
 # system starts, so it is typically used to load production configuration

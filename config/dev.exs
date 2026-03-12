@@ -1,5 +1,10 @@
 import Config
 
+# Local OAuth credentials (create from config/dev.secret.exs.example)
+if File.exists?(Path.expand("dev.secret.exs", __DIR__)) do
+  import_config "dev.secret.exs"
+end
+
 # Configure your database
 config :myapp, Myapp.Repo,
   username: "postgres",

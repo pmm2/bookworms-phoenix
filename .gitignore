@@ -35,3 +35,6 @@ myapp-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Local secrets (Google OAuth, etc.)
+config/dev.secret.exs
+

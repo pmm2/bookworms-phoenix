@@ -10,7 +10,7 @@ defmodule MyappWeb.LoginLive do
 
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash} show_nav={@show_nav}>
+    <Layouts.app flash={@flash} show_nav={@show_nav} current_user={@current_user}>
       <div class="flex flex-col items-center justify-center min-h-[70vh] px-4">
         <div class="w-full max-w-sm space-y-8 text-center">
           <div class="space-y-2">
@@ -24,15 +24,13 @@ defmodule MyappWeb.LoginLive do
           </div>
 
           <div class="space-y-4">
-            <.link
-              navigate={~p"/clubs"}
-              class="btn btn-primary btn-lg w-full gap-2 hover:scale-[1.02] active:scale-[0.98] transition-transform"
+            <a
+              href={~p"/auth/google"}
+              class="btn btn-primary btn-lg w-full gap-2 hover:scale-[1.02] active:scale-[0.98] transition-transform inline-flex items-center justify-center"
             >
-              <.icon name="hero-arrow-right-on-rectangle" class="w-5 h-5" /> Sign in with Google
-            </.link>
-            <p class="text-xs text-base-content/50">
-              Demo: click to continue without authentication
-            </p>
+              <.icon name="hero-arrow-right-on-rectangle" class="w-5 h-5" />
+              Sign in with Google
+            </a>
           </div>
         </div>
       </div>

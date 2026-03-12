@@ -92,7 +92,7 @@ defmodule MyappWeb.BookClubsLive do
 
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash} show_nav={@show_nav}>
+    <Layouts.app flash={@flash} show_nav={@show_nav} current_user={@current_user}>
       <div class="space-y-8">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <h1 class="text-2xl font-bold text-base-content">My book clubs</h1>

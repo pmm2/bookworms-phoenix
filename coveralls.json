@@ -1,0 +1,12 @@
+{
+  "skip_files": [
+    "lib/myapp.ex",
+    "lib/myapp/mailer.ex",
+    "lib/myapp/repo.ex",
+    "lib/myapp_web/endpoint.ex",
+    "lib/myapp_web/gettext.ex",
+    "lib/myapp_web/controllers/page_html.ex",
+    "lib/myapp_web/components/core_components.ex",
+    "test/"
+  ]
+}

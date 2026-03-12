@@ -8,19 +8,33 @@ defmodule MyappWeb.Router do
     plug :put_root_layout, html: {MyappWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug MyappWeb.AuthPlug, :fetch_current_user
   end
 
   pipeline :api do
     plug :accepts, ["json"]
   end
 
+  scope "/auth", MyappWeb do
+    pipe_through :browser
+
+    get "/:provider", AuthController, :request
+    get "/:provider/callback", AuthController, :callback
+  end
+
   scope "/", MyappWeb do
     pipe_through :browser
 
     get "/", PageController, :redirect_to_login
+    delete "/logout", AuthController, :delete
 
-    live_session :default do
+    live_session :redirect_if_authenticated,
+      on_mount: [{MyappWeb.LiveAuth, :redirect_if_authenticated}] do
       live "/login", LoginLive, :index
+    end
+
+    live_session :require_authenticated,
+      on_mount: [{MyappWeb.LiveAuth, :require_authenticated}] do
       live "/clubs", BookClubsLive, :index
       live "/clubs/:id", BookClubLive, :show
     end

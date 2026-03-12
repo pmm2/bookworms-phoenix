@@ -33,6 +33,8 @@ defmodule MyappWeb.Layouts do
 
   attr :show_nav, :boolean, default: true, doc: "show main nav links"
 
+  attr :current_user, :any, default: nil, doc: "the current logged-in user"
+
   slot :inner_block, required: true
 
   def app(assigns) do
@@ -51,6 +53,23 @@ defmodule MyappWeb.Layouts do
         <.link :if={@show_nav} navigate={~p"/clubs"} class="btn btn-ghost btn-sm gap-1">
           <.icon name="hero-squares-2x2" class="w-4 h-4" /> Clubs
         </.link>
+        <div :if={@current_user} class="flex items-center gap-2">
+          <span class="text-sm text-base-content/70 hidden sm:inline">{@current_user.name}</span>
+          <img
+            :if={@current_user.avatar_url}
+            src={@current_user.avatar_url}
+            alt={@current_user.name}
+            class="w-8 h-8 rounded-full"
+          />
+          <.link
+            href={~p"/logout"}
+            method="delete"
+            class="btn btn-ghost btn-sm gap-1"
+          >
+            <.icon name="hero-arrow-right-on-rectangle" class="w-4 h-4" />
+            Sign out
+          </.link>
+        </div>
         <.theme_toggle />
       </div>
     </header>
