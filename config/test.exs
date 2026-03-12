@@ -29,6 +29,9 @@ config :swoosh, :api_client, false
 # Print only warnings and errors during test
 config :logger, level: :warning
 
+# Faster bcrypt for tests
+config :bcrypt_elixir, :log_rounds, 4
+
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
 

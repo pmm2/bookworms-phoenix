@@ -27,10 +27,12 @@ defmodule MyappWeb.Router do
 
     get "/", PageController, :redirect_to_login
     delete "/logout", AuthController, :delete
+    post "/session", SessionController, :create
 
     live_session :redirect_if_authenticated,
       on_mount: [{MyappWeb.LiveAuth, :redirect_if_authenticated}] do
       live "/login", LoginLive, :index
+      live "/register", RegisterLive, :index
     end
 
     live_session :require_authenticated,

@@ -83,7 +83,7 @@ defmodule MyappWeb.AuthPlugTest do
 
   defp insert_user! do
     %User{}
-    |> User.changeset(%{
+    |> User.oauth_changeset(%{
       email: "plug-#{System.unique_integer([:positive])}@example.com",
       name: "Plug User",
       google_uid: "google-#{System.unique_integer([:positive])}"

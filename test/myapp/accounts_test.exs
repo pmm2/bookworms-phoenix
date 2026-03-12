@@ -42,6 +42,72 @@ defmodule Myapp.AccountsTest do
     end
   end
 
+  describe "register_user/1" do
+    test "creates a user with email and password" do
+      attrs = %{
+        "email" => "newuser@example.com",
+        "name" => "New User",
+        "password" => "secret123",
+        "password_confirmation" => "secret123"
+      }
+
+      assert {:ok, user} = Accounts.register_user(attrs)
+      assert user.email == "newuser@example.com"
+      assert user.name == "New User"
+      assert user.password_hash != nil
+      assert user.google_uid == nil
+    end
+
+    test "returns error for invalid attrs" do
+      assert {:error, _} =
+               Accounts.register_user(%{"email" => "", "name" => "", "password" => "short"})
+    end
+
+    test "returns error for duplicate email" do
+      attrs = %{
+        "email" => "dup@example.com",
+        "name" => "First",
+        "password" => "password123",
+        "password_confirmation" => "password123"
+      }
+
+      assert {:ok, _} = Accounts.register_user(attrs)
+      assert {:error, changeset} = Accounts.register_user(attrs)
+      assert %{email: ["has already been taken"]} = errors_on(changeset)
+    end
+  end
+
+  describe "get_user_by_email_and_password/2" do
+    test "returns user when email and password match" do
+      {:ok, user} =
+        Accounts.register_user(%{
+          "email" => "auth@example.com",
+          "name" => "Auth User",
+          "password" => "password123",
+          "password_confirmation" => "password123"
+        })
+
+      assert found = Accounts.get_user_by_email_and_password("auth@example.com", "password123")
+      assert found.id == user.id
+    end
+
+    test "returns nil when password is wrong" do
+      {:ok, _user} =
+        Accounts.register_user(%{
+          "email" => "wrong@example.com",
+          "name" => "User",
+          "password" => "password123",
+          "password_confirmation" => "password123"
+        })
+
+      assert nil == Accounts.get_user_by_email_and_password("wrong@example.com", "wrongpass")
+    end
+
+    test "returns nil when email does not exist" do
+      assert nil == Accounts.get_user_by_email_and_password("nonexistent@example.com", "anything")
+    end
+  end
+
   describe "get_user!/1" do
     test "returns user when exists" do
       user = insert_user!()
@@ -76,7 +142,7 @@ defmodule Myapp.AccountsTest do
       })
 
     %User{}
-    |> User.changeset(attrs)
+    |> User.oauth_changeset(attrs)
     |> Myapp.Repo.insert!()
   end
 end

@@ -75,7 +75,7 @@ defmodule MyappWeb.AuthControllerTest do
 
   defp insert_user! do
     %User{}
-    |> User.changeset(%{
+    |> User.oauth_changeset(%{
       email: "logout-#{System.unique_integer([:positive])}@example.com",
       name: "Logout User",
       google_uid: "google-#{System.unique_integer([:positive])}"

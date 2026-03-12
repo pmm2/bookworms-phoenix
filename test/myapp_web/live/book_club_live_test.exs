@@ -66,7 +66,7 @@ defmodule MyappWeb.BookClubLiveTest do
 
   defp insert_user! do
     %Myapp.Accounts.User{}
-    |> Myapp.Accounts.User.changeset(%{
+    |> Myapp.Accounts.User.oauth_changeset(%{
       email: "club-#{System.unique_integer([:positive])}@example.com",
       name: "Club User",
       google_uid: "google-#{System.unique_integer([:positive])}"
