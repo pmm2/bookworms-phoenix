@@ -1,6 +1,8 @@
 defmodule MyappWeb.BookClubLive do
   use MyappWeb, :live_view
 
+  alias Myapp.Clubs
+
   @mock_sessions [
     %{
       id: "1",
@@ -56,44 +58,46 @@ defmodule MyappWeb.BookClubLive do
     %{rank: 4, user_name: "Morgan Blake", total_pages: 180, badge: nil}
   ]
 
-  @mock_club %{
-    id: "1",
-    name: "Sci-Fi Nerds",
-    invite_code: "SF2024"
-  }
-
   def mount(%{"id" => id}, _session, socket) do
-    club = get_mock_club(id)
+    current_user = socket.assigns.current_user
 
-    {:ok,
-     socket
-     |> assign(:page_title, club.name)
-     |> assign(:club, club)
-     |> assign(:sessions, @mock_sessions)
-     |> assign(:leaderboard, @mock_leaderboard)
-     |> assign(:show_log_modal, false)
-     |> assign(
-       :log_form,
-       to_form(
-         %{
-           "book_name" => "",
-           "amount" => "",
-           "unit" => "pages",
-           "session_date" => Date.utc_today() |> Date.to_iso8601()
-         }, as: :session)
-     )
-     |> assign(:show_nav, true)}
+    case Clubs.get_club(id) do
+      nil ->
+        {:ok,
+         socket
+         |> put_flash(:error, "Club not found.")
+         |> push_navigate(to: ~p"/clubs")}
+
+      club ->
+        if Clubs.membership?(club, current_user) do
+          {:ok,
+           socket
+           |> assign(:page_title, club.name)
+           |> assign(:club, club)
+           |> assign(:sessions, @mock_sessions)
+           |> assign(:leaderboard, @mock_leaderboard)
+           |> assign(:show_log_modal, false)
+           |> assign(
+             :log_form,
+             to_form(
+               %{
+                 "book_name" => "",
+                 "amount" => "",
+                 "unit" => "pages",
+                 "session_date" => Date.utc_today() |> Date.to_iso8601()
+               },
+               as: :session
+             )
+           )
+           |> assign(:show_nav, true)}
+        else
+          {:ok,
+           socket
+           |> put_flash(:error, "You don't have access to this club.")
+           |> push_navigate(to: ~p"/clubs")}
+        end
+    end
   end
-
-  defp get_mock_club("1"), do: %{@mock_club | name: "Sci-Fi Nerds", invite_code: "SF2024"}
-
-  defp get_mock_club("2"),
-    do: %{@mock_club | id: "2", name: "Classics Crew", invite_code: "CLS42"}
-
-  defp get_mock_club("3"),
-    do: %{@mock_club | id: "3", name: "Mystery Lovers", invite_code: "MYST99"}
-
-  defp get_mock_club(_), do: @mock_club
 
   def handle_event("open_log", _params, socket) do
     today = Date.utc_today() |> Date.to_iso8601()

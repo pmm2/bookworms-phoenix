@@ -3,12 +3,13 @@ defmodule MyappWeb.BookClubsLiveTest do
 
   test "displays book clubs when logged in", %{conn: conn} do
     user = insert_user!()
+    {:ok, _club} = Myapp.Clubs.create_club(user, "My First Club")
     conn = log_in_user(conn, user)
 
     {:ok, view, html} = live(conn, ~p"/clubs")
 
     assert html =~ "My book clubs"
-    assert html =~ "Sci-Fi Nerds"
+    assert html =~ "My First Club"
     assert has_element?(view, "button", "Join club")
     assert has_element?(view, "button", "Create club")
   end
@@ -38,17 +39,19 @@ defmodule MyappWeb.BookClubsLiveTest do
   end
 
   test "submits join form", %{conn: conn} do
-    user = insert_user!()
-    conn = log_in_user(conn, user)
+    owner = insert_user!()
+    {:ok, club} = Myapp.Clubs.create_club(owner, "Invite Club")
+    joiner = insert_user!()
+    conn = log_in_user(conn, joiner)
 
     {:ok, view, _html} = live(conn, ~p"/clubs")
     view |> element("button", "Join club") |> render_click()
 
     view
-    |> form("#join-club-form", %{join: %{invite_code: "JOIN123"}})
+    |> form("#join-club-form", %{join: %{invite_code: club.invite_code}})
     |> render_submit()
 
-    assert render(view) =~ "My book clubs"
+    assert render(view) =~ "Invite Club"
   end
 
   test "submits create form", %{conn: conn} do

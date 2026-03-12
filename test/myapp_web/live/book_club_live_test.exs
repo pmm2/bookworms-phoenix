@@ -3,25 +3,37 @@ defmodule MyappWeb.BookClubLiveTest do
 
   test "displays club detail when logged in", %{conn: conn} do
     user = insert_user!()
+    {:ok, club} = Myapp.Clubs.create_club(user, "Test Club")
     conn = log_in_user(conn, user)
 
-    {:ok, view, html} = live(conn, ~p"/clubs/1")
+    {:ok, view, html} = live(conn, ~p"/clubs/#{club.id}")
 
-    assert html =~ "Sci-Fi Nerds"
-    assert html =~ "Project Hail Mary"
+    assert html =~ "Test Club"
     assert html =~ "March 2025 leaderboard"
     assert has_element?(view, "button", "Log reading")
   end
 
   test "redirects to login when not logged in", %{conn: conn} do
-    assert {:error, {:redirect, %{to: "/login"}}} = live(conn, ~p"/clubs/1")
+    user = insert_user!()
+    {:ok, club} = Myapp.Clubs.create_club(user, "Test")
+    assert {:error, {:redirect, %{to: "/login"}}} = live(conn, ~p"/clubs/#{club.id}")
+  end
+
+  test "redirects to clubs when user is not a member", %{conn: conn} do
+    owner = insert_user!()
+    {:ok, club} = Myapp.Clubs.create_club(owner, "Private Club")
+    non_member = insert_user!()
+    conn = log_in_user(conn, non_member)
+
+    assert {:error, {:live_redirect, %{to: "/clubs"}}} = live(conn, ~p"/clubs/#{club.id}")
   end
 
   test "opens log modal when clicking Log reading", %{conn: conn} do
     user = insert_user!()
+    {:ok, club} = Myapp.Clubs.create_club(user, "Log Club")
     conn = log_in_user(conn, user)
 
-    {:ok, view, _html} = live(conn, ~p"/clubs/1")
+    {:ok, view, _html} = live(conn, ~p"/clubs/#{club.id}")
 
     view |> element("button", "Log reading") |> render_click()
     assert has_element?(view, "#log-session-form")
@@ -29,9 +41,10 @@ defmodule MyappWeb.BookClubLiveTest do
 
   test "submits log form", %{conn: conn} do
     user = insert_user!()
+    {:ok, club} = Myapp.Clubs.create_club(user, "Log Club")
     conn = log_in_user(conn, user)
 
-    {:ok, view, _html} = live(conn, ~p"/clubs/1")
+    {:ok, view, _html} = live(conn, ~p"/clubs/#{club.id}")
     view |> element("button", "Log reading") |> render_click()
 
     view
@@ -45,7 +58,7 @@ defmodule MyappWeb.BookClubLiveTest do
     })
     |> render_submit()
 
-    assert render(view) =~ "Sci-Fi Nerds"
+    assert render(view) =~ "Log Club"
   end
 
   defp insert_user! do
