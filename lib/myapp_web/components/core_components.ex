@@ -400,14 +400,16 @@ defmodule MyappWeb.CoreComponents do
 
   def modal(assigns) do
     ~H"""
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div
         class="absolute inset-0 bg-black/50 backdrop-blur-sm"
         phx-click={@on_click}
         aria-hidden="true"
       >
       </div>
-      <div class="relative bg-base-100 rounded-xl shadow-xl max-w-md w-full p-6">
+      <div
+        class="modal-bottom-sheet relative bg-base-100 w-full sm:max-w-md sm:w-full rounded-t-2xl sm:rounded-xl shadow-xl p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:pb-6 max-h-[90vh] sm:max-h-[calc(100vh-2rem)] overflow-y-auto"
+      >
         {render_slot(@inner_block)}
       </div>
     </div>

@@ -136,7 +136,7 @@ defmodule MyappWeb.BookClubLive do
         <%!-- Monthly leaderboard --%>
         <div class="rounded-xl border-2 border-base-200 bg-base-200/30 p-5">
           <h2 class="font-semibold text-lg mb-4 flex items-center gap-2">
-            <.icon name="hero-trophy" class="w-5 h-5 text-primary" />
+            <.icon name="hero-trophy" class="w-5 h-5 text-accent" />
             {leaderboard_title()}
           </h2>
           <div class="space-y-2">
@@ -144,13 +144,13 @@ defmodule MyappWeb.BookClubLive do
               :for={entry <- @leaderboard}
               class={[
                 "flex items-center gap-4 rounded-lg px-4 py-3 transition-colors",
-                entry.rank == 1 && "bg-primary/10 border border-primary/20",
+                entry.rank == 1 && "bg-accent/10 border border-accent/30",
                 entry.rank != 1 && "hover:bg-base-200/50"
               ]}
             >
               <span class={[
                 "flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold shrink-0",
-                entry.rank == 1 && "bg-primary text-primary-content",
+                entry.rank == 1 && "bg-accent text-accent-content",
                 entry.rank == 2 && "bg-base-300 text-base-content",
                 entry.rank == 3 && "bg-amber-500/20 text-amber-700 dark:text-amber-300",
                 entry.rank > 3 && "bg-base-300/50 text-base-content/70"
@@ -161,7 +161,7 @@ defmodule MyappWeb.BookClubLive do
                 <span class="font-medium text-base-content">
                   {entry.user_name}
                   <%= if entry.badge == :winner do %>
-                    <span class="ml-2 text-xs font-normal px-2 py-0.5 rounded-full bg-primary/20 text-primary">
+                    <span class="ml-2 text-xs font-normal px-2 py-0.5 rounded-full bg-accent/20 text-accent-content">
                       Winner
                     </span>
                   <% end %>
@@ -221,22 +221,20 @@ defmodule MyappWeb.BookClubLive do
                 placeholder="e.g. Project Hail Mary"
                 class="input-bordered"
               />
-              <div class="grid grid-cols-2 gap-4">
-                <.input
-                  field={@log_form[:amount]}
-                  type="number"
-                  label="Amount"
-                  placeholder="45"
-                  class="input-bordered"
-                />
-                <.input
-                  field={@log_form[:unit]}
-                  type="select"
-                  label="Unit"
-                  options={[{"Pages", "pages"}, {"Minutes", "minutes"}]}
-                  class="select-bordered"
-                />
-              </div>
+              <.input
+                field={@log_form[:amount]}
+                type="number"
+                label="Amount"
+                placeholder="45"
+                class="input-bordered"
+              />
+              <.input
+                field={@log_form[:unit]}
+                type="select"
+                label="Unit"
+                options={[{"Pages", "pages"}, {"Minutes", "minutes"}]}
+                class="select-bordered"
+              />
               <.input
                 field={@log_form[:session_date]}
                 type="date"

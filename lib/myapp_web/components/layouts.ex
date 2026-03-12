@@ -39,39 +39,74 @@ defmodule MyappWeb.Layouts do
 
   def app(assigns) do
     ~H"""
-    <header class="navbar px-4 sm:px-6 lg:px-8 border-b border-base-200/60 bg-base-100/95 backdrop-blur-sm sticky top-0 z-40">
-      <div class="flex-1">
-        <.link
-          navigate={~p"/clubs"}
-          class="flex w-fit items-center gap-2 hover:opacity-80 transition-opacity"
-        >
-          <.icon name="hero-book-open" class="w-8 h-8 text-primary" />
-          <span class="text-xl font-bold tracking-tight text-base-content">Bookworms</span>
-        </.link>
+    <div class="drawer drawer-end">
+      <input id="sidebar-drawer" type="checkbox" class="drawer-toggle" />
+      <div class="drawer-content">
+        <header class="navbar px-4 sm:px-6 lg:px-8 border-b border-base-200/60 bg-base-100/95 backdrop-blur-sm sticky top-0 z-40">
+          <div class="flex-1">
+            <.link
+              navigate={~p"/clubs"}
+              class="flex w-fit items-center gap-2 hover:opacity-80 transition-opacity"
+            >
+              <.icon name="hero-book-open" class="w-8 h-8 text-primary" />
+              <span class="text-xl font-bold tracking-tight text-base-content">Bookworms</span>
+            </.link>
+          </div>
+          <div class="flex-none">
+            <label
+              :if={@current_user}
+              for="sidebar-drawer"
+              class="btn btn-ghost btn-square drawer-button"
+              aria-label="Open menu"
+            >
+              <.icon name="hero-bars-3" class="w-6 h-6" />
+            </label>
+          </div>
+        </header>
       </div>
-      <div class="flex-none flex items-center gap-3">
-        <.link :if={@show_nav} navigate={~p"/clubs"} class="btn btn-ghost btn-sm gap-1">
-          <.icon name="hero-squares-2x2" class="w-4 h-4" /> Clubs
-        </.link>
-        <div :if={@current_user} class="flex items-center gap-2">
-          <span class="text-sm text-base-content/70 hidden sm:inline">{@current_user.name}</span>
-          <img
-            :if={@current_user.avatar_url}
-            src={@current_user.avatar_url}
-            alt={@current_user.name}
-            class="w-8 h-8 rounded-full"
-          />
-          <.link
-            href={~p"/logout"}
-            method="delete"
-            class="btn btn-ghost btn-sm gap-1"
-          >
-            <.icon name="hero-arrow-right-on-rectangle" class="w-4 h-4" /> Sign out
-          </.link>
-        </div>
-        <.theme_toggle />
+      <div class="drawer-side">
+        <label for="sidebar-drawer" class="drawer-overlay" aria-label="Close menu" />
+        <aside class="bg-base-200 min-h-full w-72 p-4">
+          <div :if={@current_user} class="flex items-center gap-3 mb-6 pb-4 border-b border-base-300">
+            <img
+              :if={@current_user.avatar_url}
+              src={@current_user.avatar_url}
+              alt={@current_user.name}
+              class="w-10 h-10 rounded-full shrink-0"
+            />
+            <div :if={!@current_user.avatar_url} class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+              <span class="text-lg font-semibold text-primary">
+                {String.first(@current_user.name)}
+              </span>
+            </div>
+            <span class="font-medium text-base-content truncate">{@current_user.name}</span>
+          </div>
+          <ul class="menu menu-lg gap-1">
+            <li>
+              <.link
+                navigate={~p"/clubs"}
+                onclick="document.getElementById('sidebar-drawer').checked = false"
+              >
+                <.icon name="hero-squares-2x2" class="w-5 h-5" /> Clubs
+              </.link>
+            </li>
+            <li>
+              <.link
+                navigate={~p"/config"}
+                onclick="document.getElementById('sidebar-drawer').checked = false"
+              >
+                <.icon name="hero-cog-6-tooth" class="w-5 h-5" /> Settings
+              </.link>
+            </li>
+            <li>
+              <.link href={~p"/logout"} method="delete" class="text-error">
+                <.icon name="hero-arrow-right-on-rectangle" class="w-5 h-5" /> Sign out
+              </.link>
+            </li>
+          </ul>
+        </aside>
       </div>
-    </header>
+    </div>
 
     <main class="px-4 py-6 sm:px-6 lg:px-8 min-h-[calc(100vh-4rem)]">
       <div class="mx-auto max-w-2xl lg:max-w-3xl">

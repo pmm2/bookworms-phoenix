@@ -39,6 +39,10 @@ custom classes must fully style the input
 
 ### UI/UX & design guidelines
 
+- **Typography**: Inter font (Google Fonts), variable weight 100–900, optical sizing. Loaded in `root.html.heex`, applied in `app.css`
+- **Color palette** (DaisyUI themes in `assets/css/app.css`):
+  - **Light**: Primary #4F46E5 (Deep Indigo), Secondary #64748B (Slate Blue), Accent #F59E0B (Warm Amber). BG #F8FAFC, Cards #FFFFFF, Text #0F172A. Use accent for streaks, achievements, highlights.
+  - **Dark**: Primary #6366F1 (Electric Indigo), Secondary #94A3B8 (Cool Slate), Accent #FBBF24 (Golden Amber). BG #0B1120, Cards #111827, Text #E5E7EB
 - **Produce world-class UI designs** with a focus on usability, aesthetics, and modern design principles
 - Implement **subtle micro-interactions** (e.g., button hover effects, and smooth transitions)
 - Ensure **clean typography, spacing, and layout balance** for a refined, premium look

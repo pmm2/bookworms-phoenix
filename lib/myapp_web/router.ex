@@ -39,6 +39,7 @@ defmodule MyappWeb.Router do
       on_mount: [{MyappWeb.LiveAuth, :require_authenticated}] do
       live "/clubs", BookClubsLive, :index
       live "/clubs/:id", BookClubLive, :show
+      live "/config", ConfigLive, :index
     end
   end
 

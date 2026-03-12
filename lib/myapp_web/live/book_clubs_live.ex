@@ -115,16 +115,16 @@ defmodule MyappWeb.BookClubsLive do
             <button
               type="button"
               phx-click="open_join"
-              class="btn btn-outline btn-sm gap-1.5 hover:btn-primary hover:border-primary transition-colors"
+              class="btn btn-outline btn-lg gap-2 hover:btn-primary hover:border-primary transition-colors"
             >
-              <.icon name="hero-ticket" class="w-4 h-4" /> Join club
+              <.icon name="hero-ticket" class="w-5 h-5" /> Join club
             </button>
             <button
               type="button"
               phx-click="open_create"
-              class="btn btn-primary btn-sm gap-1.5"
+              class="btn btn-primary btn-lg gap-2"
             >
-              <.icon name="hero-plus-circle" class="w-4 h-4" /> Create club
+              <.icon name="hero-plus-circle" class="w-5 h-5" /> Create club
             </button>
           </div>
         </div>
