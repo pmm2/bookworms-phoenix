@@ -120,6 +120,12 @@ html {
   font-size: 1rem;
   font-weight: 500;
 }
+/* Stack label above input so inputs align horizontally */
+.fieldset label {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
 .fieldset input:not([type="checkbox"]):not([type="radio"]),
 .fieldset select,
 .fieldset textarea {

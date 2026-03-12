@@ -20,18 +20,24 @@ defmodule MyappWeb.BookClubsLive do
     assign(socket, :clubs, clubs)
   end
 
+  defp open_modal(socket, :join) do
+    socket
+    |> assign(:show_join_modal, true)
+    |> assign(:show_create_modal, false)
+  end
+
+  defp open_modal(socket, :create) do
+    socket
+    |> assign(:show_create_modal, true)
+    |> assign(:show_join_modal, false)
+  end
+
   def handle_event("open_join", _params, socket) do
-    {:noreply,
-     socket
-     |> assign(:show_join_modal, true)
-     |> assign(:show_create_modal, false)}
+    {:noreply, open_modal(socket, :join)}
   end
 
   def handle_event("open_create", _params, socket) do
-    {:noreply,
-     socket
-     |> assign(:show_create_modal, true)
-     |> assign(:show_join_modal, false)}
+    {:noreply, open_modal(socket, :create)}
   end
 
   def handle_event("close_modal", _params, socket) do

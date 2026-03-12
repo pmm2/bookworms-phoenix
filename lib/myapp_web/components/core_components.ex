@@ -407,9 +407,7 @@ defmodule MyappWeb.CoreComponents do
         aria-hidden="true"
       >
       </div>
-      <div
-        class="modal-bottom-sheet relative bg-base-100 w-full sm:max-w-md sm:w-full rounded-t-2xl sm:rounded-xl shadow-xl p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:pb-6 max-h-[90vh] sm:max-h-[calc(100vh-2rem)] overflow-y-auto"
-      >
+      <div class="modal-bottom-sheet relative bg-base-100 w-full sm:max-w-md sm:w-full rounded-t-2xl sm:rounded-xl shadow-xl p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:pb-6 max-h-[90vh] sm:max-h-[calc(100vh-2rem)] overflow-y-auto">
         {render_slot(@inner_block)}
       </div>
     </div>

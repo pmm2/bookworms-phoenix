@@ -22,18 +22,7 @@ defmodule MyappWeb.BookClubLive do
            |> assign(:sessions, Clubs.list_sessions(club))
            |> assign(:leaderboard, Clubs.list_leaderboard(club))
            |> assign(:show_log_modal, false)
-           |> assign(
-             :log_form,
-             to_form(
-               %{
-                 "book_name" => "",
-                 "amount" => "",
-                 "unit" => "pages",
-                 "session_date" => Date.utc_today() |> Date.to_iso8601()
-               },
-               as: :session
-             )
-           )
+           |> assign(:log_form, default_log_form())
            |> assign(:show_nav, true)}
         else
           {:ok,
@@ -45,17 +34,10 @@ defmodule MyappWeb.BookClubLive do
   end
 
   def handle_event("open_log", _params, socket) do
-    today = Date.utc_today() |> Date.to_iso8601()
-
     {:noreply,
      socket
      |> assign(:show_log_modal, true)
-     |> assign(
-       :log_form,
-       to_form(%{"book_name" => "", "amount" => "", "unit" => "pages", "session_date" => today},
-         as: :session
-       )
-     )}
+     |> assign(:log_form, default_log_form())}
   end
 
   def handle_event("close_log_modal", _params, socket) do
@@ -67,8 +49,6 @@ defmodule MyappWeb.BookClubLive do
 
     case Clubs.log_session(current_user, club, params) do
       {:ok, _session} ->
-        today = Date.utc_today() |> Date.to_iso8601()
-
         {:noreply,
          socket
          |> put_flash(
@@ -78,18 +58,10 @@ defmodule MyappWeb.BookClubLive do
          |> assign(:show_log_modal, false)
          |> assign(:sessions, Clubs.list_sessions(club))
          |> assign(:leaderboard, Clubs.list_leaderboard(club))
-         |> assign(
-           :log_form,
-           to_form(
-             %{"book_name" => "", "amount" => "", "unit" => "pages", "session_date" => today},
-             as: :session
-           )
-         )}
+         |> assign(:log_form, default_log_form())}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply,
-         socket
-         |> assign(:log_form, to_form(changeset, as: :session))}
+        {:noreply, assign(socket, :log_form, to_form(changeset, as: :session))}
 
       {:error, :not_member} ->
         {:noreply,
@@ -263,21 +235,28 @@ defmodule MyappWeb.BookClubLive do
   defp format_amount(%{amount: amt, unit: unit}) when unit in [:minutes, "minutes"],
     do: "#{amt} min"
 
-  defp format_leaderboard_entry(entry) do
-    parts = []
+  defp default_log_form do
+    today = Date.utc_today() |> Date.to_iso8601()
 
-    parts =
-      if (entry[:total_pages] || 0) > 0,
-        do: [to_string(entry[:total_pages]) <> " pages" | parts],
-        else: parts
-
-    parts =
-      if (entry[:total_minutes] || 0) > 0,
-        do: [to_string(entry[:total_minutes]) <> " min" | parts],
-        else: parts
-
-    if parts == [], do: "—", else: Enum.reverse(parts) |> Enum.join(" · ")
+    to_form(%{"book_name" => "", "amount" => "", "unit" => "pages", "session_date" => today},
+      as: :session
+    )
   end
+
+  defp format_leaderboard_entry(entry) do
+    total_pages = entry[:total_pages] || 0
+    total_minutes = entry[:total_minutes] || 0
+
+    parts =
+      []
+      |> add_if(total_pages > 0, "#{total_pages} pages")
+      |> add_if(total_minutes > 0, "#{total_minutes} min")
+
+    if parts == [], do: "—", else: Enum.join(Enum.reverse(parts), " · ")
+  end
+
+  defp add_if(parts, true, value), do: [value | parts]
+  defp add_if(parts, false, _value), do: parts
 
   defp leaderboard_title do
     now = Date.utc_today()

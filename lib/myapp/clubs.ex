@@ -151,12 +151,12 @@ defmodule Myapp.Clubs do
   @doc """
   Logs a reading session for a user in a club.
   """
-  def log_session(%User{} = user, %BookClub{id: club_id}, attrs) do
-    if membership?(%BookClub{id: club_id}, user) do
+  def log_session(%User{} = user, %BookClub{} = club, attrs) do
+    if membership?(club, user) do
       attrs =
         attrs
         |> Map.put("user_id", user.id)
-        |> Map.put("book_club_id", club_id)
+        |> Map.put("book_club_id", club.id)
 
       %ReadingSession{}
       |> ReadingSession.changeset(attrs)

@@ -74,7 +74,10 @@ defmodule MyappWeb.Layouts do
               alt={@current_user.name}
               class="w-10 h-10 rounded-full shrink-0"
             />
-            <div :if={!@current_user.avatar_url} class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+            <div
+              :if={!@current_user.avatar_url}
+              class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0"
+            >
               <span class="text-lg font-semibold text-primary">
                 {String.first(@current_user.name)}
               </span>

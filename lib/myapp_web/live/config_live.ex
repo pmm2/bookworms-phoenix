@@ -24,8 +24,7 @@ defmodule MyappWeb.ConfigLive do
 
         <div class="rounded-xl border border-base-200 bg-base-100 p-6">
           <h2 class="font-semibold text-lg mb-4 flex items-center gap-2">
-            <.icon name="hero-swatch" class="w-5 h-5 text-primary" />
-            Theme
+            <.icon name="hero-swatch" class="w-5 h-5 text-primary" /> Theme
           </h2>
           <p class="text-sm text-base-content/70 mb-4">
             Choose how Bookworms looks. Your preference is saved.

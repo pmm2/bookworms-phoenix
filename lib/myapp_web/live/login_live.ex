@@ -40,7 +40,7 @@ defmodule MyappWeb.LoginLive do
                 type="email"
                 label="Email"
                 placeholder="you@example.com"
-                class="input-bordered"
+                class="input-bordered w-full"
                 required
               />
               <.input
@@ -48,10 +48,10 @@ defmodule MyappWeb.LoginLive do
                 type="password"
                 label="Password"
                 placeholder="••••••••"
-                class="input-bordered"
+                class="input-bordered w-full"
                 required
               />
-              <button type="submit" class="btn btn-primary btn-block gap-2">
+              <button type="submit" class="btn btn-primary btn-lg w-full gap-2">
                 <.icon name="hero-envelope" class="w-5 h-5" /> Sign in with email
               </button>
             </.form>
@@ -64,7 +64,7 @@ defmodule MyappWeb.LoginLive do
 
             <a
               href={~p"/auth/google"}
-              class="btn btn-outline btn-lg w-full gap-2 hover:scale-[1.01] active:scale-[0.99] transition-transform inline-flex items-center justify-center"
+              class="btn btn-outline btn-lg w-full gap-2 inline-flex items-center justify-center"
             >
               <.icon name="hero-arrow-right-on-rectangle" class="w-5 h-5" /> Sign in with Google
             </a>
