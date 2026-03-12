@@ -3,6 +3,7 @@ This is a web application written using the Phoenix web framework.
 ## Project guidelines
 
 - Use `mix precommit` alias when you are done with all changes and fix any pending issues
+- **Code quality**: The project uses `ex_check` to run all analysis tools. Run `mix check` (or `mix precommit`) before committing. Tools include: **Credo** (style/design), **Sobelow** (Phoenix security), **mix_audit** (dependency vulnerabilities), **unused_deps**, **formatter**, **ex_unit** with coverage. See `.check.exs` for config. Dialyzer and Gettext are disabled by default (Dialyzer has ExUnit false positives; Gettext needs manual `mix gettext.extract`). Run `mix credo` or `mix sobelow` individually for quick feedback
 - Use the already included and available `:req` (`Req`) library for HTTP requests, **avoid** `:httpoison`, `:tesla`, and `:httpc`. Req is included by default and is the preferred HTTP client for Phoenix apps
 
 ### Phoenix v1.8 guidelines
@@ -87,6 +88,7 @@ custom classes must fully style the input
 
 ## Mix guidelines
 
+- **Code quality & precommit**: Run `mix precommit` (or `mix check`) before committing. This runs compiler, formatter, Credo, Sobelow, mix_audit, unused_deps, and tests with coverage. Config in `.check.exs` and `.sobelow-conf`. Dialyzer is disabled (ExUnit false positives); re-enable when ready for type checking
 - Read the docs and options before using tasks (by using `mix help task_name`)
 - To debug test failures, run tests in a specific file with `mix test test/my_test.exs` or run all previously failed tests with `mix test --failed`
 - `mix deps.clean --all` is **almost never needed**. **Avoid** using it unless you have good reason

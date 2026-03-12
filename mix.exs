@@ -29,7 +29,14 @@ defmodule Myapp.MixProject do
 
   def cli do
     [
-      preferred_envs: [precommit: :test]
+      preferred_envs: [
+        precommit: :test,
+        check: :test,
+        credo: :test,
+        dialyzer: :test,
+        sobelow: :test,
+        "deps.audit": :test
+      ]
     ]
   end
 
@@ -71,7 +78,13 @@ defmodule Myapp.MixProject do
       {:ueberauth, "~> 0.10"},
       {:ueberauth_google, "~> 0.12"},
       {:bcrypt_elixir, "~> 3.0"},
-      {:excoveralls, "~> 0.18", only: :test}
+      {:excoveralls, "~> 0.18", only: :test},
+      # Code quality (run via mix check)
+      {:ex_check, "~> 0.16", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:sobelow, "~> 0.12", only: [:dev, :test], runtime: false},
+      {:mix_audit, "~> 0.1", only: [:dev, :test], runtime: false}
     ]
   end
 
@@ -94,7 +107,7 @@ defmodule Myapp.MixProject do
         "esbuild myapp --minify",
         "phx.digest"
       ],
-      precommit: ["compile --warning-as-errors", "deps.unlock --unused", "format", "test --cover"]
+      precommit: "check"
     ]
   end
 end

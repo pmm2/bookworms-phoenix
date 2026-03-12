@@ -53,19 +53,24 @@ defmodule Myapp.Clubs do
     if code == "" do
       {:error, :invite_code_required}
     else
-      case Repo.get_by(BookClub, invite_code: code) do
-        nil ->
-          {:error, :not_found}
+      do_join_club(user, code)
+    end
+  end
 
-        club ->
-          if membership?(club, user) do
-            {:error, :already_member}
-          else
-            case add_member(club, user, "member") do
-              {:ok, _} -> {:ok, Repo.preload(club, :owner)}
-              error -> error
-            end
-          end
+  defp do_join_club(user, code) do
+    case Repo.get_by(BookClub, invite_code: code) do
+      nil -> {:error, :not_found}
+      club -> add_club_member_if_allowed(club, user)
+    end
+  end
+
+  defp add_club_member_if_allowed(club, user) do
+    if membership?(club, user) do
+      {:error, :already_member}
+    else
+      case add_member(club, user, "member") do
+        {:ok, _} -> {:ok, Repo.preload(club, :owner)}
+        error -> error
       end
     end
   end
@@ -123,16 +128,7 @@ defmodule Myapp.Clubs do
     |> Enum.group_by(& &1.user_id, & &1)
     |> Enum.map(fn {user_id, sessions} ->
       user = hd(sessions).user
-
-      {total_pages, total_minutes} =
-        Enum.reduce(sessions, {0, 0}, fn s, {pages, mins} ->
-          case s.unit do
-            "pages" -> {pages + s.amount, mins}
-            "minutes" -> {pages, mins + s.amount}
-            _ -> {pages, mins}
-          end
-        end)
-
+      {total_pages, total_minutes} = sum_session_amounts(sessions)
       score = total_pages + div(total_minutes, 2)
 
       %{
@@ -156,9 +152,7 @@ defmodule Myapp.Clubs do
   Logs a reading session for a user in a club.
   """
   def log_session(%User{} = user, %BookClub{id: club_id}, attrs) do
-    unless membership?(%BookClub{id: club_id}, user) do
-      {:error, :not_member}
-    else
+    if membership?(%BookClub{id: club_id}, user) do
       attrs =
         attrs
         |> Map.put("user_id", user.id)
@@ -167,6 +161,8 @@ defmodule Myapp.Clubs do
       %ReadingSession{}
       |> ReadingSession.changeset(attrs)
       |> Repo.insert()
+    else
+      {:error, :not_member}
     end
   end
 
@@ -220,6 +216,16 @@ defmodule Myapp.Clubs do
 
   defp maybe_preload_owner(nil), do: nil
   defp maybe_preload_owner(club), do: Repo.preload(club, :owner)
+
+  defp sum_session_amounts(sessions) do
+    Enum.reduce(sessions, {0, 0}, fn s, {pages, mins} ->
+      case s.unit do
+        "pages" -> {pages + s.amount, mins}
+        "minutes" -> {pages, mins + s.amount}
+        _ -> {pages, mins}
+      end
+    end)
+  end
 
   defp to_feed_entry(%ReadingSession{} = s) do
     %{
