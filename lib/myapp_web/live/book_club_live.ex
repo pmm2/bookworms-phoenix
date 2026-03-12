@@ -3,61 +3,6 @@ defmodule MyappWeb.BookClubLive do
 
   alias Myapp.Clubs
 
-  @mock_sessions [
-    %{
-      id: "1",
-      user_name: "Alex Rivera",
-      book_name: "Project Hail Mary",
-      amount: 45,
-      unit: :pages,
-      session_date: ~D[2025-03-12],
-      inserted_at: "2 hours ago"
-    },
-    %{
-      id: "2",
-      user_name: "Jordan Lee",
-      book_name: "The Midnight Library",
-      amount: 90,
-      unit: :minutes,
-      session_date: ~D[2025-03-12],
-      inserted_at: "5 hours ago"
-    },
-    %{
-      id: "3",
-      user_name: "Sam Chen",
-      book_name: "Dune",
-      amount: 28,
-      unit: :pages,
-      session_date: ~D[2025-03-11],
-      inserted_at: "Yesterday"
-    },
-    %{
-      id: "4",
-      user_name: "Morgan Blake",
-      book_name: "Atomic Habits",
-      amount: 30,
-      unit: :minutes,
-      session_date: ~D[2025-03-11],
-      inserted_at: "Yesterday"
-    },
-    %{
-      id: "5",
-      user_name: "Alex Rivera",
-      book_name: "Project Hail Mary",
-      amount: 52,
-      unit: :pages,
-      session_date: ~D[2025-03-10],
-      inserted_at: "2 days ago"
-    }
-  ]
-
-  @mock_leaderboard [
-    %{rank: 1, user_name: "Alex Rivera", total_pages: 312, badge: :winner},
-    %{rank: 2, user_name: "Jordan Lee", total_pages: 280, badge: nil},
-    %{rank: 3, user_name: "Sam Chen", total_pages: 245, badge: nil},
-    %{rank: 4, user_name: "Morgan Blake", total_pages: 180, badge: nil}
-  ]
-
   def mount(%{"id" => id}, _session, socket) do
     current_user = socket.assigns.current_user
 
@@ -74,8 +19,8 @@ defmodule MyappWeb.BookClubLive do
            socket
            |> assign(:page_title, club.name)
            |> assign(:club, club)
-           |> assign(:sessions, @mock_sessions)
-           |> assign(:leaderboard, @mock_leaderboard)
+           |> assign(:sessions, Clubs.list_sessions(club))
+           |> assign(:leaderboard, Clubs.list_leaderboard(club))
            |> assign(:show_log_modal, false)
            |> assign(
              :log_form,
@@ -118,16 +63,40 @@ defmodule MyappWeb.BookClubLive do
   end
 
   def handle_event("log_submit", %{"session" => params}, socket) do
-    {:noreply,
-     socket
-     |> put_flash(:info, "Logged: #{params["book_name"]} — #{params["amount"]} #{params["unit"]}")
-     |> assign(:show_log_modal, false)
-     |> assign(
-       :log_form,
-       to_form(%{"book_name" => "", "amount" => "", "unit" => "pages", "session_date" => ""},
-         as: :session
-       )
-     )}
+    {club, current_user} = {socket.assigns.club, socket.assigns.current_user}
+
+    case Clubs.log_session(current_user, club, params) do
+      {:ok, _session} ->
+        today = Date.utc_today() |> Date.to_iso8601()
+
+        {:noreply,
+         socket
+         |> put_flash(
+           :info,
+           "Logged: #{params["book_name"]} — #{params["amount"]} #{params["unit"]}"
+         )
+         |> assign(:show_log_modal, false)
+         |> assign(:sessions, Clubs.list_sessions(club))
+         |> assign(:leaderboard, Clubs.list_leaderboard(club))
+         |> assign(
+           :log_form,
+           to_form(
+             %{"book_name" => "", "amount" => "", "unit" => "pages", "session_date" => today},
+             as: :session
+           )
+         )}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply,
+         socket
+         |> assign(:log_form, to_form(changeset, as: :session))}
+
+      {:error, :not_member} ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "You're not a member of this club.")
+         |> assign(:show_log_modal, false)}
+    end
   end
 
   def handle_event("validate_log", %{"session" => params}, socket) do
@@ -167,7 +136,8 @@ defmodule MyappWeb.BookClubLive do
         <%!-- Monthly leaderboard --%>
         <div class="rounded-xl border-2 border-base-200 bg-base-200/30 p-5">
           <h2 class="font-semibold text-lg mb-4 flex items-center gap-2">
-            <.icon name="hero-trophy" class="w-5 h-5 text-primary" /> March 2025 leaderboard
+            <.icon name="hero-trophy" class="w-5 h-5 text-primary" />
+            {leaderboard_title()}
           </h2>
           <div class="space-y-2">
             <div
@@ -198,7 +168,7 @@ defmodule MyappWeb.BookClubLive do
                 </span>
               </div>
               <span class="text-sm font-semibold text-base-content/80 shrink-0">
-                {entry.total_pages} pages
+                {format_leaderboard_entry(entry)}
               </span>
             </div>
           </div>
@@ -289,8 +259,32 @@ defmodule MyappWeb.BookClubLive do
     """
   end
 
-  defp format_amount(%{amount: amt, unit: :pages}), do: "#{amt} pages"
-  defp format_amount(%{amount: amt, unit: :minutes}), do: "#{amt} min"
+  defp format_amount(%{amount: amt, unit: unit}) when unit in [:pages, "pages"],
+    do: "#{amt} pages"
+
+  defp format_amount(%{amount: amt, unit: unit}) when unit in [:minutes, "minutes"],
+    do: "#{amt} min"
+
+  defp format_leaderboard_entry(entry) do
+    parts = []
+
+    parts =
+      if (entry[:total_pages] || 0) > 0,
+        do: [to_string(entry[:total_pages]) <> " pages" | parts],
+        else: parts
+
+    parts =
+      if (entry[:total_minutes] || 0) > 0,
+        do: [to_string(entry[:total_minutes]) <> " min" | parts],
+        else: parts
+
+    if parts == [], do: "—", else: Enum.reverse(parts) |> Enum.join(" · ")
+  end
+
+  defp leaderboard_title do
+    now = Date.utc_today()
+    Calendar.strftime(now, "%B %Y") <> " leaderboard"
+  end
 
   defp format_date(date) do
     date

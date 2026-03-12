@@ -38,6 +38,7 @@ defmodule MyappWeb.AuthPlugTest do
   describe "require_authenticated" do
     test "allows through when current_user is set", %{conn: conn} do
       user = insert_user!()
+
       conn =
         conn
         |> Phoenix.ConnTest.bypass_through(MyappWeb.Router, :browser)
@@ -64,14 +65,17 @@ defmodule MyappWeb.AuthPlugTest do
   describe "redirect_if_authenticated" do
     test "redirects to clubs when current_user is set", %{conn: conn} do
       user = insert_user!()
-      conn = conn |> Plug.Conn.assign(:current_user, user) |> AuthPlug.redirect_if_authenticated([])
+
+      conn =
+        conn |> Plug.Conn.assign(:current_user, user) |> AuthPlug.redirect_if_authenticated([])
 
       assert conn.halted
       assert redirected_to(conn) == ~p"/clubs"
     end
 
     test "allows through when current_user is nil", %{conn: conn} do
-      conn = conn |> Plug.Conn.assign(:current_user, nil) |> AuthPlug.redirect_if_authenticated([])
+      conn =
+        conn |> Plug.Conn.assign(:current_user, nil) |> AuthPlug.redirect_if_authenticated([])
 
       refute conn.halted
     end

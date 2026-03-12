@@ -93,7 +93,7 @@ defmodule Myapp.MixProject do
         "esbuild myapp --minify",
         "phx.digest"
       ],
-      precommit: ["compile --warning-as-errors", "deps.unlock --unused", "format", "test --cover"],
+      precommit: ["compile --warning-as-errors", "deps.unlock --unused", "format", "test --cover"]
     ]
   end
 end

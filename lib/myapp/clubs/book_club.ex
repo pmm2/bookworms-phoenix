@@ -10,6 +10,7 @@ defmodule Myapp.Clubs.BookClub do
     belongs_to :owner, Myapp.Accounts.User
     has_many :memberships, Myapp.Clubs.BookClubMembership
     has_many :members, through: [:memberships, :user]
+    has_many :reading_sessions, Myapp.Clubs.ReadingSession
 
     timestamps(type: :utc_datetime)
   end

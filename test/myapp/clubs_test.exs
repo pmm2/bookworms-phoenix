@@ -67,6 +67,97 @@ defmodule Myapp.ClubsTest do
     end
   end
 
+  describe "log_session/3" do
+    test "creates a reading session for a member", %{} do
+      user = insert_user!()
+      {:ok, club} = Clubs.create_club(user, "Reading Club")
+
+      attrs = %{
+        "book_name" => "Dune",
+        "amount" => "50",
+        "unit" => "pages",
+        "session_date" => Date.utc_today() |> Date.to_iso8601()
+      }
+
+      assert {:ok, session} = Clubs.log_session(user, club, attrs)
+      assert session.book_name == "Dune"
+      assert session.amount == 50
+      assert session.unit == "pages"
+      assert session.user_id == user.id
+      assert session.book_club_id == club.id
+    end
+
+    test "returns error when user is not a member", %{} do
+      owner = insert_user!()
+      {:ok, club} = Clubs.create_club(owner, "Private Club")
+      non_member = insert_user!()
+
+      attrs = %{
+        "book_name" => "Dune",
+        "amount" => "50",
+        "unit" => "pages",
+        "session_date" => Date.utc_today() |> Date.to_iso8601()
+      }
+
+      assert {:error, :not_member} = Clubs.log_session(non_member, club, attrs)
+    end
+  end
+
+  describe "list_sessions/1" do
+    test "returns sessions for club ordered newest first", %{} do
+      user = insert_user!()
+      {:ok, club} = Clubs.create_club(user, "Feed Club")
+
+      Clubs.log_session(user, club, %{
+        "book_name" => "First",
+        "amount" => "10",
+        "unit" => "pages",
+        "session_date" => Date.add(Date.utc_today(), -2) |> Date.to_iso8601()
+      })
+
+      Clubs.log_session(user, club, %{
+        "book_name" => "Second",
+        "amount" => "20",
+        "unit" => "minutes",
+        "session_date" => Date.utc_today() |> Date.to_iso8601()
+      })
+
+      sessions = Clubs.list_sessions(club)
+      assert length(sessions) == 2
+      assert hd(sessions).book_name == "Second"
+      assert hd(sessions).user_name == user.name
+    end
+  end
+
+  describe "list_leaderboard/1" do
+    test "returns members ranked by reading this month", %{} do
+      user1 = insert_user!()
+      user2 = insert_user!()
+      {:ok, club} = Clubs.create_club(user1, "Leader Club")
+      Clubs.join_club(user2, club.invite_code)
+
+      Clubs.log_session(user1, club, %{
+        "book_name" => "Book A",
+        "amount" => "100",
+        "unit" => "pages",
+        "session_date" => Date.utc_today() |> Date.to_iso8601()
+      })
+
+      Clubs.log_session(user2, club, %{
+        "book_name" => "Book B",
+        "amount" => "50",
+        "unit" => "pages",
+        "session_date" => Date.utc_today() |> Date.to_iso8601()
+      })
+
+      leaderboard = Clubs.list_leaderboard(club)
+      assert length(leaderboard) == 2
+      assert hd(leaderboard).user_name == user1.name
+      assert hd(leaderboard).rank == 1
+      assert hd(leaderboard).total_pages == 100
+    end
+  end
+
   defp insert_user! do
     %User{}
     |> User.changeset(%{

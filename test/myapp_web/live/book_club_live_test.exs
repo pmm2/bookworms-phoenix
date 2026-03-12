@@ -9,7 +9,7 @@ defmodule MyappWeb.BookClubLiveTest do
     {:ok, view, html} = live(conn, ~p"/clubs/#{club.id}")
 
     assert html =~ "Test Club"
-    assert html =~ "March 2025 leaderboard"
+    assert html =~ "leaderboard"
     assert has_element?(view, "button", "Log reading")
   end
 
@@ -58,7 +58,10 @@ defmodule MyappWeb.BookClubLiveTest do
     })
     |> render_submit()
 
-    assert render(view) =~ "Log Club"
+    html = render(view)
+    assert html =~ "Log Club"
+    assert html =~ "Test Book"
+    assert html =~ "50 pages"
   end
 
   defp insert_user! do

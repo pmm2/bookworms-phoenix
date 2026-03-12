@@ -66,8 +66,7 @@ defmodule MyappWeb.Layouts do
             method="delete"
             class="btn btn-ghost btn-sm gap-1"
           >
-            <.icon name="hero-arrow-right-on-rectangle" class="w-4 h-4" />
-            Sign out
+            <.icon name="hero-arrow-right-on-rectangle" class="w-4 h-4" /> Sign out
           </.link>
         </div>
         <.theme_toggle />

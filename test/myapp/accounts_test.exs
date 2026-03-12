@@ -16,10 +16,14 @@ defmodule Myapp.AccountsTest do
     end
 
     test "updates existing user when google_uid exists" do
-      auth = build_ueberauth(uid: "google-456", email: "existing@example.com", name: "Original Name")
+      auth =
+        build_ueberauth(uid: "google-456", email: "existing@example.com", name: "Original Name")
+
       user = Accounts.get_or_create_user_from_auth(auth)
 
-      auth_updated = build_ueberauth(uid: "google-456", email: "existing@example.com", name: "Updated Name")
+      auth_updated =
+        build_ueberauth(uid: "google-456", email: "existing@example.com", name: "Updated Name")
+
       updated = Accounts.get_or_create_user_from_auth(auth_updated)
 
       assert updated.id == user.id

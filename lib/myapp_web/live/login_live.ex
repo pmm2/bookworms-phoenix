@@ -28,8 +28,7 @@ defmodule MyappWeb.LoginLive do
               href={~p"/auth/google"}
               class="btn btn-primary btn-lg w-full gap-2 hover:scale-[1.02] active:scale-[0.98] transition-transform inline-flex items-center justify-center"
             >
-              <.icon name="hero-arrow-right-on-rectangle" class="w-5 h-5" />
-              Sign in with Google
+              <.icon name="hero-arrow-right-on-rectangle" class="w-5 h-5" /> Sign in with Google
             </a>
           </div>
         </div>

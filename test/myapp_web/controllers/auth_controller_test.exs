@@ -13,7 +13,8 @@ defmodule MyappWeb.AuthControllerTest do
 
   describe "GET /auth/google/callback" do
     test "creates user and redirects to clubs on success", %{conn: conn} do
-      auth = build_ueberauth(uid: "google-999", email: "callback@example.com", name: "Callback User")
+      auth =
+        build_ueberauth(uid: "google-999", email: "callback@example.com", name: "Callback User")
 
       conn =
         conn
@@ -29,7 +30,11 @@ defmodule MyappWeb.AuthControllerTest do
     end
 
     test "redirects to login on ueberauth failure", %{conn: conn} do
-      failure = %Ueberauth.Failure{provider: :google, strategy: Ueberauth.Strategy.Google, errors: []}
+      failure = %Ueberauth.Failure{
+        provider: :google,
+        strategy: Ueberauth.Strategy.Google,
+        errors: []
+      }
 
       conn =
         conn
